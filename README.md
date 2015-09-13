@@ -1,6 +1,8 @@
 This is a basic twitter app to read and compose tweets the [Twitter API](https://apps.twitter.com/).
 
-Time spent: 2
+Time spent: 6 so far
+
+I'm sick and scheduled to be on vacation. Will work on this when I get back.
 
 ### Features
 

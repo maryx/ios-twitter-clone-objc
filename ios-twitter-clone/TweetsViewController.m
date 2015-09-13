@@ -12,7 +12,8 @@
 #import "TwitterClient.h"
 
 @interface TweetsViewController ()
-
+@property (weak, nonatomic) IBOutlet UITableView *tweetTableView;
+@property (weak, nonatomic) IBOutlet UILabel *tweetLabel;
 @end
 
 @implementation TweetsViewController
@@ -28,6 +29,7 @@
     [[TwitterClient sharedInstance] homeTimelineWithParams:nil completion: ^(NSArray *tweets, NSError *error) {
         for (Tweet *tweet in tweets) {
             NSLog(@"text %@", tweet.text);
+            _tweetLabel.text = tweet.text;
         }
     }
      ];
