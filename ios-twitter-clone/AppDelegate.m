@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import "LoginViewController.h"
+#import "TwitterClient.h"
 
 @interface AppDelegate ()
 
@@ -17,7 +19,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = [[LoginViewController alloc] init]; // Sets first page as the login page
+    [self.window makeKeyAndVisible];
     return YES;
+
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -40,6 +46,33 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+
+    [[TwitterClient sharedInstance]
+     fetchAccessTokenWithPath: @"oauth/access_token"
+     method: @"POST"
+     requestToken: [BDBOAuth1Credential credentialWithQueryString: url.query]
+     success: ^(BDBOAuth1Credential *accessToken){
+         NSLog(@"got token");
+         [[TwitterClient sharedInstance].requestSerializer saveAccessToken: accessToken];
+         // Future requests will be authenticated requests
+         [[TwitterClient sharedInstance]
+          GET:@"1.1/account/verify_credentials.json"
+          parameters: nil
+          success: ^(AFHTTPRequestOperation *operation, id responseObject) {
+              NSLog(@"current User: %@", responseObject);
+          }
+          failure: ^(AFHTTPRequestOperation *operation, NSError *error) {
+              NSLog(@"failed to get user");
+          }];
+     }
+     failure:^(NSError *error){
+         NSLog(@"failed token");
+     }];
+    
+    return YES;
 }
 
 @end
